@@ -33,6 +33,8 @@ def main():
     myuser.connect()
     myuser.RECEIVE_PUBLIC_KEY(myuser.SOCKET,3)
     myuser.SEND_PUBLIC_KEY(myuser.SOCKET,3)
+    myuser.VALIDATE_CLIENT(myuser.SOCKET)
+
     
 
 if __name__ == '__main__' :

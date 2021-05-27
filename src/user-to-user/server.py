@@ -32,6 +32,9 @@ def main() :
     myuser.accept()
     myuser.SEND_PUBLIC_KEY(myuser.CLIENT_CONN,3)
     myuser.RECEIVE_PUBLIC_KEY(myuser.CLIENT_CONN,3)
+    myuser.VERIFY_CLIENT(myuser.CLIENT_CONN)
+
     
+
 if __name__ == '__main__' :
     main()

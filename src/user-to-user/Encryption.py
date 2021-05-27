@@ -95,10 +95,6 @@ class User:
         encrypted = encryptor.encrypt(message)
         return encrypted
 
-    def SEND_CREDS(self,sock):
-        data=self.NAME+b'::'+self.HASH.encode()+b'::'+secrets.token_bytes()
-        self.SEND_ASYM_DATA(sock,self.ASYM_ENC(data))
-
     def SEND_ASYM_DATA(self,sock,message):
         sock.send(self.ASYM_ENC(message))
 
@@ -106,17 +102,26 @@ class User:
         decryptor = PKCS1_OAEP.new(self.KEYPAIR)
         decrypted = decryptor.decrypt(message)
         return(decrypted)
-
-    def RECV_CREDS(self, message):
-        data=self.ASYM_DEC(message).decode()
-        if data.split("::")[1]==self.HASH :
-            print("OK")
         
-    def RECV_ASYM_DATA(self,sock,size):
+    def RECV_ASYM_DATA(self,sock,size=2048):
         return self.ASYM_DEC(sock.recv(size))
+
+    def VALIDATE_CLIENT(self,sock):
+        data=self.NAME+"::"+self.HASH+"::"+secrets.token_urlsafe()
+        self.SEND_ASYM_DATA(sock,data.encode())
+
+    def VERIFY_CLIENT(self,sock):
+        data=self.RECV_ASYM_DATA(sock).decode().split("::")
+        print(f"[+] Validating Credentials From {data[0]}::{self.CLIENT_ADDR[0]}")
+        if data[1]==self.HASH :
+            print(f'[+] User "{data[0]}" Has Been Successfully Authenticated')
+            self.CLIENT_USERNAME=data[0]
+
+
 
     def EXIT_GRACEFULLY(self,SOCKS,CODE):
         for sock in SOCKS :
             if sock != None :
                 sock.close()
         exit(CODE)
+
