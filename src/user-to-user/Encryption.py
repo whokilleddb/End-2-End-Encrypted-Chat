@@ -5,6 +5,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 from hashlib import md5,sha256
 import binascii
+import secrets
 
 class User:
     def __init__(self,name,ip,port,passhash):
@@ -83,11 +84,36 @@ class User:
                 flag=True
                 self.CLIENT_PUBLIC_KEY=SERVER_KEY
                 self.ENCRYPTOR=RSA.importKey(SERVER_KEY)
-                print(f"[+] Received Public Key : \n{SERVER_KEY.decode()}\n[+] MD5Sum : {TRIAL_HASH}")
+                print(f"[+] Received Public Key !\n[+] Checks Passed !")
                 break
         if not flag :
             print("[-] Failed To Receive Public Key ")
             self.EXIT_GRACEFULLY([self.CLIENT_CONN,self.SOCKET],-4)
+
+    def ASYM_ENC(self,message):
+        encryptor = PKCS1_OAEP.new(self.ENCRYPTOR)
+        encrypted = encryptor.encrypt(message)
+        return encrypted
+
+    def SEND_CREDS(self,sock):
+        data=self.NAME+b'::'+self.HASH.encode()+b'::'+secrets.token_bytes()
+        self.SEND_ASYM_DATA(sock,self.ASYM_ENC(data))
+
+    def SEND_ASYM_DATA(self,sock,message):
+        sock.send(self.ASYM_ENC(message))
+
+    def ASYM_DEC(self,message):
+        decryptor = PKCS1_OAEP.new(self.KEYPAIR)
+        decrypted = decryptor.decrypt(message)
+        return(decrypted)
+
+    def RECV_CREDS(self, message):
+        data=self.ASYM_DEC(message).decode()
+        if data.split("::")[1]==self.HASH :
+            print("OK")
+        
+    def RECV_ASYM_DATA(self,sock,size):
+        return self.ASYM_DEC(sock.recv(size))
 
     def EXIT_GRACEFULLY(self,SOCKS,CODE):
         for sock in SOCKS :

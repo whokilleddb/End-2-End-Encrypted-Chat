@@ -26,11 +26,12 @@ def main() :
     #Generate User
     print("[+] Generating Session Profile")
     myuser=User(args.n,args.i,args.p,passhash)
-    print(f"[+] Your Public Key : \n{myuser.PUBLIC_KEY.exportKey().decode()}\n[+] MD5Sum : {myuser.PUBLIC_KEY_HASH}")
+    print(f"[+] Generated RSA Keys For Self !")
 
     #Listen On A Port
     myuser.accept()
     myuser.SEND_PUBLIC_KEY(myuser.CLIENT_CONN,3)
-
+    myuser.RECEIVE_PUBLIC_KEY(myuser.CLIENT_CONN,3)
+    
 if __name__ == '__main__' :
     main()

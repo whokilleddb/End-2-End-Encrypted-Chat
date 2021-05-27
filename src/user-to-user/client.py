@@ -32,6 +32,8 @@ def main():
     #Connect To A Port
     myuser.connect()
     myuser.RECEIVE_PUBLIC_KEY(myuser.SOCKET,3)
+    myuser.SEND_PUBLIC_KEY(myuser.SOCKET,3)
+    
 
 if __name__ == '__main__' :
     main()
