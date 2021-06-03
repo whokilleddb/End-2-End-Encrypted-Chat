@@ -3,6 +3,7 @@ from sys import exit
 from time import sleep
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
+from cryptography.fernet import Fernet
 from hashlib import md5,sha256
 import binascii
 import secrets
@@ -56,6 +57,9 @@ class User:
         self.CLIENT_CONN,self.CLIENT_ADDR=self.SOCKET.accept()
         print(f"[+] Received Connection From {self.CLIENT_ADDR[0]}:{self.CLIENT_ADDR[1]} ")
 
+    def GENERATE_SESSION_KEY(self):
+        self.SESSION_KEY=Fernet.generate_key()
+
     def SEND_PUBLIC_KEY(self,sock,tries):
         flag=False
         for i in range(0,tries):
@@ -106,20 +110,30 @@ class User:
     def RECV_ASYM_DATA(self,sock,size=2048):
         return self.ASYM_DEC(sock.recv(size))
 
-    def VALIDATE_CLIENT(self,sock):
+    def VALIDATE_CLIENT(self,sock,tries=3):
         data=self.NAME+"::"+self.HASH+"::"+secrets.token_urlsafe()
         self.SEND_ASYM_DATA(sock,data.encode())
+        recv=self.RECV_ASYM_DATA(sock)
+        if (recv).decode()=="NOTOK":
+            return False
+        else :
+            self.SESSION_KEY=recv
+            return True
 
-    def VERIFY_CLIENT(self,sock):
+    def VERIFY_CLIENT(self,sock,tries=3):
         data=self.RECV_ASYM_DATA(sock).decode().split("::")
         print(f"[+] Validating Credentials From {data[0]}::{self.CLIENT_ADDR[0]}")
         if data[1]==self.HASH :
-            print(f'[+] User "{data[0]}" Has Been Successfully Authenticated')
+            self.GENERATE_SESSION_KEY()
+            self.SEND_ASYM_DATA(sock,self.SESSION_KEY)
             self.CLIENT_USERNAME=data[0]
-
-
-
-    def EXIT_GRACEFULLY(self,SOCKS,CODE):
+            return True
+        else :
+            self.SEND_ASYM_DATA(sock,b"NOTOK")
+            #self.EXIT_GRACEFULLY([self.SOCKET,self.CLIENT_CONN])
+            return False
+       
+    def EXIT_GRACEFULLY(self,SOCKS,CODE=-1):
         for sock in SOCKS :
             if sock != None :
                 sock.close()

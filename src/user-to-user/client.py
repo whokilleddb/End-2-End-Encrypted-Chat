@@ -33,7 +33,12 @@ def main():
     myuser.connect()
     myuser.RECEIVE_PUBLIC_KEY(myuser.SOCKET,3)
     myuser.SEND_PUBLIC_KEY(myuser.SOCKET,3)
-    myuser.VALIDATE_CLIENT(myuser.SOCKET)
+    if not myuser.VALIDATE_CLIENT(myuser.SOCKET) :
+        print("[-] Verification Attempt Failed")
+        myuser.EXIT_GRACEFULLY([myuser.SOCKET])
+    else :
+        print("[+] Successfully Verified Client")
+        print(f"[+] Session Key : \n {myuser.SESSION_KEY}")        
 
     
 

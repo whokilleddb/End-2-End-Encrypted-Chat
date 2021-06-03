@@ -32,7 +32,12 @@ def main() :
     myuser.accept()
     myuser.SEND_PUBLIC_KEY(myuser.CLIENT_CONN,3)
     myuser.RECEIVE_PUBLIC_KEY(myuser.CLIENT_CONN,3)
-    myuser.VERIFY_CLIENT(myuser.CLIENT_CONN)
+    if not myuser.VERIFY_CLIENT(myuser.CLIENT_CONN) :
+        print(f"[-] Could Not Verify {myuser.CLIENT_USERNAME}:{myuser.CLIENT_ADDR[0]}")
+        myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
+    else :
+        print(f'[+] User "{myuser.CLIENT_USERNAME}" Has Been Successfully Authenticated')
+        print(f"[+] Session Key : \n{myuser.SESSION_KEY}")
 
     
 
