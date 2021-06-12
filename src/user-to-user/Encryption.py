@@ -23,6 +23,7 @@ class User:
         self.CLIENT_PUBLIC_KEY=""
         self.CLIENT_USERNAME=""
         self.ENCRYPTOR=None
+        self.SESSION_ENCRYPTOR=None
         self.PUBLIC_KEY_HASH=md5(self.PUBLIC_KEY.exportKey()).hexdigest()
 
     def listen(self):
@@ -132,7 +133,16 @@ class User:
             self.SEND_ASYM_DATA(sock,b"NOTOK")
             #self.EXIT_GRACEFULLY([self.SOCKET,self.CLIENT_CONN])
             return False
-       
+
+    def INIT_SESSION_ENCRYPTOR(self):
+        self.GEN_SESSION_ENCRYPTOR=Fernet(self.SESSION_KEY)
+
+    def ENC_MESS(self,message):
+        return self.GEN_SESSION_ENCRYPTOR.encrypt(message)
+
+    def DEC_MESS(self,enc):
+        return self.GEN_SESSION_ENCRYPTOR.decrypt(enc)
+
     def EXIT_GRACEFULLY(self,SOCKS,CODE=-1):
         for sock in SOCKS :
             if sock != None :

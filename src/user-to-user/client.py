@@ -38,7 +38,8 @@ def main():
         myuser.EXIT_GRACEFULLY([myuser.SOCKET])
     else :
         print("[+] Successfully Verified Client")
-        print(f"[+] Session Key : \n {myuser.SESSION_KEY}")        
+#        print(f"[+] Session Key : \n {myuser.SESSION_KEY}")  
+        myuser.INIT_SESSION_ENCRYPTOR()      
 
     
 

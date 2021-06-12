@@ -37,7 +37,9 @@ def main() :
         myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
     else :
         print(f'[+] User "{myuser.CLIENT_USERNAME}" Has Been Successfully Authenticated')
-        print(f"[+] Session Key : \n{myuser.SESSION_KEY}")
+#        print(f"[+] Session Key : \n{myuser.SESSION_KEY}")
+        myuser.INIT_SESSION_ENCRYPTOR()
+
 
     
 
