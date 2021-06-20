@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import threading
 import sys
 import argparse
 import getpass
@@ -21,7 +22,7 @@ def main() :
     #print(passhash)
 
     #Print Info
-    showMyInfo(args.n,args.i,args.p,passhash)
+    showMyInfo(args.n,args.i,args.p)
     
     #Generate User
     print("[+] Generating Session Profile")
@@ -37,8 +38,20 @@ def main() :
         myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
     else :
         print(f'[+] User "{myuser.CLIENT_USERNAME}" Has Been Successfully Authenticated')
-#        print(f"[+] Session Key : \n{myuser.SESSION_KEY}")
+#       print(f"[+] Session Key : \n{myuser.SESSION_KEY}")
         myuser.INIT_SESSION_ENCRYPTOR()
+#       print(myuser.SESSION_KEY)
+        print("[+] Starting Session : ")
+        t = threading.Thread(target=RECV_DATA,args=(myuser.CLIENT_CONN,myuser.GEN_SESSION_ENCRYPTOR,myuser.CLIENT_ADDR[0],myuser.CLIENT_USERNAME))
+        try :
+            t.start()
+            SEND_DATA(myuser.CLIENT_CONN,myuser.GEN_SESSION_ENCRYPTOR)
+        except KeyboardInterrupt :
+            myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
+
+        
+
+
 
 
     

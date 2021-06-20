@@ -137,11 +137,11 @@ class User:
     def INIT_SESSION_ENCRYPTOR(self):
         self.GEN_SESSION_ENCRYPTOR=Fernet(self.SESSION_KEY)
 
-    def ENC_MESS(self,message):
-        return self.GEN_SESSION_ENCRYPTOR.encrypt(message)
+#    def ENC_MESS(self,message):
+#        return self.GEN_SESSION_ENCRYPTOR.encrypt(message)
 
-    def DEC_MESS(self,enc):
-        return self.GEN_SESSION_ENCRYPTOR.decrypt(enc)
+#    def DEC_MESS(self,enc):
+#        return self.GEN_SESSION_ENCRYPTOR.decrypt(enc)
 
     def EXIT_GRACEFULLY(self,SOCKS,CODE=-1):
         for sock in SOCKS :
