@@ -33,6 +33,7 @@ def main() :
     myuser.accept()
     myuser.SEND_PUBLIC_KEY(myuser.CLIENT_CONN,3)
     myuser.RECEIVE_PUBLIC_KEY(myuser.CLIENT_CONN,3)
+
     if not myuser.VERIFY_CLIENT(myuser.CLIENT_CONN) :
         print(f"[-] Could Not Verify {myuser.CLIENT_USERNAME}:{myuser.CLIENT_ADDR[0]}")
         myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
@@ -42,6 +43,7 @@ def main() :
         myuser.INIT_SESSION_ENCRYPTOR()
 #       print(myuser.SESSION_KEY)
         print("[+] Starting Session : ")
+
         try :
             t = threading.Thread(target=RECV_DATA,args=(myuser.CLIENT_CONN,myuser.GEN_SESSION_ENCRYPTOR,myuser.CLIENT_ADDR[0],myuser.CLIENT_USERNAME))
             t.start()
@@ -49,13 +51,6 @@ def main() :
         except Exception as e :
             print("[-] Got Exception As {e}\n[-] Exiting!")
             myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
-
-        
-
-
-
-
-    
 
 if __name__ == '__main__' :
     main()
