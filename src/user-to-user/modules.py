@@ -17,13 +17,19 @@ def DEC_MESS(cryptor,message):
 
 def RECV_DATA(socket,cryptor,ip,name="Sender"):        
     while True:
-        recv_msg=socket.recv(2048)
-        if not recv_msg :
-            sys.exit(0)
-        recv_mess=DEC_MESS(cryptor,(recv_msg)).decode()
-        print(f"\n{ip}:{name} > {recv_mess}")
+        try :
+            recv_msg=socket.recv(2048)
+            if not recv_msg :
+                sys.exit(0)
+            recv_mess=DEC_MESS(cryptor,(recv_msg)).decode()
+            print(f"{ip}:{name} ↴\n{recv_mess}\nYour Turn ↴")
+        except :
+            break
 
 def SEND_DATA(socket,cryptor):
     while True:
-        send_msg=input(str("\nMe > "))
-        socket.send(ENC_MESS(cryptor,send_msg.encode()))
+        try :
+            send_msg=input(str("Your Turn ↴ \n"))
+            socket.send(ENC_MESS(cryptor,send_msg.encode()))
+        except :
+            break

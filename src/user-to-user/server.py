@@ -42,11 +42,12 @@ def main() :
         myuser.INIT_SESSION_ENCRYPTOR()
 #       print(myuser.SESSION_KEY)
         print("[+] Starting Session : ")
-        t = threading.Thread(target=RECV_DATA,args=(myuser.CLIENT_CONN,myuser.GEN_SESSION_ENCRYPTOR,myuser.CLIENT_ADDR[0],myuser.CLIENT_USERNAME))
         try :
+            t = threading.Thread(target=RECV_DATA,args=(myuser.CLIENT_CONN,myuser.GEN_SESSION_ENCRYPTOR,myuser.CLIENT_ADDR[0],myuser.CLIENT_USERNAME))
             t.start()
             SEND_DATA(myuser.CLIENT_CONN,myuser.GEN_SESSION_ENCRYPTOR)
-        except KeyboardInterrupt :
+        except Exception as e :
+            print("[-] Got Exception As {e}\n[-] Exiting!")
             myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
 
         

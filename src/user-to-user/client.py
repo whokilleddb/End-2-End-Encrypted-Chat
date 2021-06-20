@@ -44,12 +44,12 @@ def main():
 #        print(myuser.SESSION_KEY)
         print("[+] Starting Session : ")
 
-        
-        t = threading.Thread(target=RECV_DATA,args=(myuser.SOCKET,myuser.GEN_SESSION_ENCRYPTOR,args.i,"Server"))
         try :
+            t = threading.Thread(target=RECV_DATA,args=(myuser.SOCKET,myuser.GEN_SESSION_ENCRYPTOR,args.i,"Server"))
             t.start()
             SEND_DATA(myuser.SOCKET,myuser.GEN_SESSION_ENCRYPTOR)
-        except KeyboardInterrupt : 
+        except Exception as e : 
+            print("[-] Got Exception As {e}\n[-] Exiting!")
             myuser.EXIT_GRACEFULLY([myuser.SOCKET])
 
 if __name__ == '__main__' :
