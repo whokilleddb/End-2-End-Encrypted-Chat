@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import threading
 import sys
 import argparse
 import getpass
@@ -21,16 +22,35 @@ def main() :
     #print(passhash)
 
     #Print Info
-    showMyInfo(args.n,args.i,args.p,passhash)
+    showMyInfo(args.n,args.i,args.p)
     
     #Generate User
     print("[+] Generating Session Profile")
     myuser=User(args.n,args.i,args.p,passhash)
-    print(f"[+] Your Public Key : \n{myuser.PUBLIC_KEY.exportKey().decode()}\n[+] MD5Sum : {myuser.PUBLIC_KEY_HASH}")
+    print(f"[+] Generated RSA Keys For Self !")
 
     #Listen On A Port
     myuser.accept()
     myuser.SEND_PUBLIC_KEY(myuser.CLIENT_CONN,3)
+    myuser.RECEIVE_PUBLIC_KEY(myuser.CLIENT_CONN,3)
+
+    if not myuser.VERIFY_CLIENT(myuser.CLIENT_CONN) :
+        print(f"[-] Could Not Verify {myuser.CLIENT_USERNAME}:{myuser.CLIENT_ADDR[0]}")
+        myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
+    else :
+        print(f'[+] User "{myuser.CLIENT_USERNAME}" Has Been Successfully Authenticated')
+#       print(f"[+] Session Key : \n{myuser.SESSION_KEY}")
+        myuser.INIT_SESSION_ENCRYPTOR()
+#       print(myuser.SESSION_KEY)
+        print("[+] Starting Session : ")
+
+        try :
+            t = threading.Thread(target=RECV_DATA,args=(myuser.CLIENT_CONN,myuser.GEN_SESSION_ENCRYPTOR,myuser.CLIENT_ADDR[0],myuser.CLIENT_USERNAME))
+            t.start()
+            SEND_DATA(myuser.CLIENT_CONN,myuser.GEN_SESSION_ENCRYPTOR)
+        except Exception as e :
+            print("[-] Got Exception As {e}\n[-] Exiting!")
+            myuser.EXIT_GRACEFULLY([myuser.SOCKET,myuser.CLIENT_CONN])
 
 if __name__ == '__main__' :
     main()

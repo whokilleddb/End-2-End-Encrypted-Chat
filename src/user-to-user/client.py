@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import threading
 import sys
 import argparse
 import getpass
@@ -22,7 +23,7 @@ def main():
     #print(passhash)
 
     #Print Info
-    showMyInfo(args.n,args.i,args.p,passhash)
+    showMyInfo(args.n,args.i,args.p)
     
     #Generate User
     print("[+] Generating Session Profile")
@@ -32,6 +33,25 @@ def main():
     #Connect To A Port
     myuser.connect()
     myuser.RECEIVE_PUBLIC_KEY(myuser.SOCKET,3)
+    myuser.SEND_PUBLIC_KEY(myuser.SOCKET,3)
+
+    if not myuser.VALIDATE_CLIENT(myuser.SOCKET) :
+        print("[-] Verification Attempt Failed")
+        myuser.EXIT_GRACEFULLY([myuser.SOCKET])
+    else :
+        print("[+] Successfully Verified Client")
+#       print(f"[+] Session Key : \n {myuser.SESSION_KEY}")  
+        myuser.INIT_SESSION_ENCRYPTOR()      
+#       print(myuser.SESSION_KEY)
+        print("[+] Starting Session : ")
+
+        try :
+            t = threading.Thread(target=RECV_DATA,args=(myuser.SOCKET,myuser.GEN_SESSION_ENCRYPTOR,args.i,"Server"))
+            t.start()
+            SEND_DATA(myuser.SOCKET,myuser.GEN_SESSION_ENCRYPTOR)
+        except Exception as e : 
+            print("[-] Got Exception As {e}\n[-] Exiting!")
+            myuser.EXIT_GRACEFULLY([myuser.SOCKET])
 
 if __name__ == '__main__' :
     main()
